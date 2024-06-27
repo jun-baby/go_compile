@@ -22,15 +22,18 @@ var versionErrorRx = regexp.MustCompile(`requires go[0-9]+\.[0-9]+ or later`)
 
 // checkFiles configures and runs the types2 checker on the given
 // parsed source files and then returns the result.
+// checkFiles 在给定的解析源文件上配置并运行 types2 检查器，然后返回结果。
 func checkFiles(m posMap, noders []*noder) (*types2.Package, *types2.Info) {
 	if base.SyntaxErrors() != 0 {
 		base.ErrorExit()
 	}
 
 	// setup and syntax error reporting
+	// 安装程序和语法错误报告
 	files := make([]*syntax.File, len(noders))
 	// posBaseMap maps all file pos bases back to *syntax.File
 	// for checking Go version mismatched.
+	// posBaseMap 将所有文件 pos 库映射回语法。用于检查 Go 版本不匹配的文件。
 	posBaseMap := make(map[*syntax.PosBase]*syntax.File)
 	for i, p := range noders {
 		files[i] = p.file

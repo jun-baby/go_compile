@@ -49,10 +49,10 @@ type source struct {
 
 	buf       []byte // source buffer
 	ioerr     error  // pending I/O error, or nil
-	b, r, e   int    // buffer indices (see comment above)
-	line, col uint   // source position of ch (0-based)
-	ch        rune   // most recently read character
-	chw       int    // width of ch
+	b, r, e   int    // 缓冲区索引(参见上面的注释) buffer indices (see comment above)
+	line, col uint   // ch在source中的位置 (0-based)
+	ch        rune   // 最近读到的字符 most recently read character
+	chw       int    // ch的宽度 width of ch
 }
 
 const sentinel = utf8.RuneSelf
@@ -131,7 +131,7 @@ redo:
 
 	// slower general case: add more bytes to buffer if we don't have a full rune
 	for s.e-s.r < utf8.UTFMax && !utf8.FullRune(s.buf[s.r:s.e]) && s.ioerr == nil {
-		s.fill()
+		s.fill() // 将数据读到缓冲区
 	}
 
 	// EOF
@@ -146,6 +146,7 @@ redo:
 		return
 	}
 
+	// 解析一个缓存区中的一个字符
 	s.ch, s.chw = utf8.DecodeRune(s.buf[s.r:s.e])
 	s.r += s.chw
 
@@ -166,12 +167,14 @@ redo:
 
 // fill reads more source bytes into s.buf.
 // It returns with at least one more byte in the buffer, or with s.ioerr != nil.
+// 从source中读取数据到buf
 func (s *source) fill() {
 	// determine content to preserve
+	// 确定要保留的内容
 	b := s.r
 	if s.b >= 0 {
 		b = s.b
-		s.b = 0 // after buffer has grown or content has been moved down
+		s.b = 0 // 缓冲区已增长或内容已下移后 after buffer has grown or content has been moved down
 	}
 	content := s.buf[b:s.e]
 

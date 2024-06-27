@@ -52,6 +52,7 @@ type walker struct {
 	v Visitor
 }
 
+// 遍历每个节点
 func (w walker) node(n Node) {
 	if n == nil {
 		panic("nil node")

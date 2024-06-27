@@ -21,6 +21,10 @@ var funcStack []*ir.Func // stack of previous values of ir.CurFunc
 //
 // Before returning, it sets CurFunc to fn. When the caller is done
 // constructing fn, it must call FinishFuncBody to restore CurFunc.
+//
+// DeclFunc 声明 fn 的参数并将其添加到 Target.Funcs。
+// 在返回之前，它将 CurFunc 设置为 fn。
+// 当调用方完成构造 fn 时，它必须调用 FinishFuncBody 来还原 CurFunc。
 func DeclFunc(fn *ir.Func) {
 	fn.DeclareParams(true)
 	fn.Nname.Defn = fn
@@ -32,6 +36,7 @@ func DeclFunc(fn *ir.Func) {
 
 // FinishFuncBody restores ir.CurFunc to its state before the last
 // call to DeclFunc.
+// FinishFuncBody 恢复 ir.CurFunc 设置为上次调用 DeclFunc 之前的状态。
 func FinishFuncBody() {
 	funcStack, ir.CurFunc = funcStack[:len(funcStack)-1], funcStack[len(funcStack)-1]
 }

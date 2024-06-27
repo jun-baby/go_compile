@@ -147,6 +147,9 @@ func typekind(t *types.Type) string {
 // The result of typecheck MUST be assigned back to n, e.g.
 //
 //	n.Left = typecheck(n.Left, top)
+//
+// typecheck 检查节点 n的类型。
+// typecheck 的结果必须赋值回 n，例如 n.Left = typecheck(n.Left,top)
 func typecheck(n ir.Node, top int) (res ir.Node) {
 	if n == nil {
 		return nil

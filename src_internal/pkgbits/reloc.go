@@ -11,10 +11,11 @@ type RelocKind int32
 // section.
 type Index int32
 
-// A relocEnt (relocation entry) is an entry in an element's local
+// RelocEnt (relocation entry) is an entry in an element's local
 // reference table.
 //
 // TODO(mdempsky): Rename this too.
+// relocEnt（重定位条目）是元素的本地引用表中的条目。
 type RelocEnt struct {
 	Kind RelocKind
 	Idx  Index

@@ -31,6 +31,7 @@
 package objabi
 
 // A SymKind describes the kind of memory represented by a symbol.
+// SymKind 描述由符号表示的内存类型。
 type SymKind uint8
 
 // Defined SymKind values.

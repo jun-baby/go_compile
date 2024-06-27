@@ -449,6 +449,7 @@ const (
 
 // An LSym is the sort of symbol that is written to an object file.
 // It represents Go symbols in a flat pkg+"."+name namespace.
+// LSym 是写入对象文件的符号类型。它表示 Go 符号在一个平坦的 pkg+“.”+name 命名空间。
 type LSym struct {
 	Name string
 	Type objabi.SymKind

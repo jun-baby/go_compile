@@ -93,6 +93,7 @@ redo:
 	// skip white space
 	s.stop()
 	startLine, startCol := s.pos()
+	// 跳过一些空白字符
 	for s.ch == ' ' || s.ch == '\t' || s.ch == '\n' && !nlsemi || s.ch == '\r' {
 		s.nextch()
 	}

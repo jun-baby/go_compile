@@ -19,6 +19,7 @@ func (f bitset8) get2(shift uint8) uint8 {
 }
 
 // set2 sets two bits in f using the bottom two bits of b.
+// 将b的最低2为设置到f中
 func (f *bitset8) set2(shift uint8, b uint8) {
 	// Clear old bits.
 	*(*uint8)(f) &^= 3 << shift

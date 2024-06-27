@@ -35,11 +35,12 @@ func (*node) aNode()           {}
 // Files
 
 // package PkgName; DeclList[0], DeclList[1], ...
+// 当文件的抽象语法树
 type File struct {
 	Pragma    Pragma
-	PkgName   *Name
-	DeclList  []Decl
-	EOF       Pos
+	PkgName   *Name  // 包名
+	DeclList  []Decl // 声明的语句
+	EOF       Pos    // 文件结束位置
 	GoVersion string
 	node
 }

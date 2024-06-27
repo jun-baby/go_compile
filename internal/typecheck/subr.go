@@ -214,6 +214,7 @@ func adddot1(s *types.Sym, t *types.Type, d int, save **types.Field, ignorecase 
 var dotlist = make([]dlist, 10)
 
 // Convert node n for assignment to type t.
+// 将用于分配的节点 n 转换为类型 t。
 func assignconvfn(n ir.Node, t *types.Type, context func() string) ir.Node {
 	if n == nil || n.Type() == nil {
 		return n

@@ -13,7 +13,7 @@ import (
 
 // Sym represents an object name in a segmented (pkg, name) namespace.
 // Most commonly, this is a Go identifier naming an object declared within a package,
-// but Syms are also used to name cmd_internal synthesized objects.
+// but Syms are also used to name internal synthesized objects.
 //
 // As an exception, field and method names that are exported use the Sym
 // associated with localpkg instead of the package that declared them. This
@@ -25,6 +25,13 @@ import (
 //
 // NOTE: In practice, things can be messier than the description above
 // for various reasons (historical, convenience).
+//
+// Sym 表示分段（pkg,name）命名空间中的对象名称。
+// 最常见的是，这是一个 Go 标识符，用于命名包中声明的对象，但 Syms 也用于命名内部的合成对象。
+// 作为例外，导出的字段和方法名称使用与 localpkg 关联的 Sym，而不是声明它们的包。
+// 这允许在处理选择器表达式时使用 Sym 指针相等来测试 Go 标识符的唯一性。
+// 理想情况下，应该使用 Sym 来表示 Go 语言结构，而 cmd/internal/obj.LSym 用于表示发射的伪影。
+// 注意：在实践中，由于各种原因（历史、方便），事情可能比上面的描述更混乱。
 type Sym struct {
 	Linkname string // link name
 
@@ -37,6 +44,9 @@ type Sym struct {
 	//
 	// Deprecated: New code should avoid depending on Sym.Def. Add
 	// mdempsky@ as a reviewer for any CLs involving Sym.Def.
+	// 此符号在当前作用域内绑定到的唯一 ONAME、OTYPE、OPACK 或 OLITERAL 节点。
+	//（编译器的大多数部分应该更喜欢直接传递 Node，而不是依赖此字段。已弃用：新代码应避免依赖 Sym.Def。
+	// 添加mdempsky@作为涉及 Sym.Def 的任何 CL 的审阅者。
 	Def Object
 
 	flags bitset8

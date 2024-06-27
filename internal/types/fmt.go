@@ -19,6 +19,7 @@ import (
 var BuiltinPkg *Pkg
 
 // LocalPkg is the package being compiled.
+// 正在编译的包
 var LocalPkg *Pkg
 
 // UnsafePkg is package unsafe.

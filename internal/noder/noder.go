@@ -55,7 +55,7 @@ func LoadPackage(filenames []string) {
 					return
 				}
 				defer f.Close()
-
+				// 解析单个文件，生成抽象语法树(AST)
 				p.file, _ = syntax.Parse(fbase, f, p.error, p.pragma, syntax.CheckBranches) // errors are tracked via p.error
 			}()
 		}
@@ -97,6 +97,7 @@ func trimFilename(b *syntax.PosBase) string {
 }
 
 // noder transforms package syntax's AST into a Node tree.
+// 抽象语法数节点
 type noder struct {
 	file       *syntax.File
 	linknames  []linkname

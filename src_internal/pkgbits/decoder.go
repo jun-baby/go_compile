@@ -255,6 +255,9 @@ func (r *Decoder) rawUvarint() uint64 {
 // readUvarint is a type-specialized copy of encoding/binary.ReadUvarint.
 // This avoids the interface conversion and thus has better escape properties,
 // which flows up the stack.
+// ReadUvarint 从 r 读取编码的无符号整数，并将其作为 uint64 返回。
+// 仅当未读取任何字节时，err是 io.EOF。
+// 如果在读取部分但不是全部字节后发生，ReadUvarint 返回 [io.ErrUnexpectedEOF]。
 func readUvarint(r *strings.Reader) (uint64, error) {
 	var x uint64
 	var s uint
@@ -301,6 +304,7 @@ func (r *Decoder) rawReloc(k RelocKind, idx int) Index {
 // that it matches the expected marker.
 //
 // If EnableSync is false, then Sync is a no-op.
+// Sync 从r中解码同步标记，并断言它与预期的标记匹配。如果 EnableSync 为 false，则 Sync 为无操作。
 func (r *Decoder) Sync(mWant SyncMarker) {
 	if !r.common.sync {
 		return
@@ -400,6 +404,7 @@ func (r *Decoder) Code(mark SyncMarker) int {
 
 // Reloc decodes a relocation of expected section k from the element
 // bitstream and returns an index to the referenced element.
+// Reloc 从r中解码预期部分 k 的重定位，并返回引用元素的索引。
 func (r *Decoder) Reloc(k RelocKind) Index {
 	r.Sync(SyncUseReloc)
 	return r.rawReloc(k, r.Len())

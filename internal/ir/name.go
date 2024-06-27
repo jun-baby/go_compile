@@ -32,13 +32,14 @@ func NewIdent(pos src.XPos, sym *types.Sym) *Ident {
 func (n *Ident) Sym() *types.Sym { return n.sym }
 
 // Name holds Node fields used only by named nodes (ONAME, OTYPE, some OLITERAL).
+// Name 包含仅由命名节点（ ONAME, OTYPE 和某些 OLITERAL）使用的 Node 字段。
 type Name struct {
 	miniExpr
 	BuiltinOp Op         // uint8
 	Class     Class      // uint8
 	pragma    PragmaFlag // int16
 	flags     bitset16
-	DictIndex uint16 // index of the dictionary entry describing the type of this variable declaration plus 1
+	DictIndex uint16 // index of the dictionary entry describing the type of this variable declaration plus 1: 描述此变量声明类型加 1 的字典条目的索引
 	sym       *types.Sym
 	Func      *Func // TODO(austin): nil for I.M
 	Offset_   int64
@@ -52,6 +53,13 @@ type Name struct {
 	// For a range variable, the range statement (ORANGE)
 	// For a recv variable in a case of a select statement, the receive assignment (OSELRECV2)
 	// For the name of a function, points to corresponding Func node.
+
+	// 对于局部变量（不是参数）或 extern，初始化赋值（OAS 或 OAS2）。
+	// 对于闭包 var，原始（最外层）捕获变量的 ONAME 节点。
+	// 对于类型开关的大小写局部变量，类型开关保护 （OTYPESW）。
+	// 对于 range 变量，range 语句 （ORANGE）
+	// 对于 select 语句的 recv 变量，接收赋值 （OSELRECV2）
+	// 对于函数的名称，指向相应的 Func 节点。
 	Defn Node
 
 	// The function, method, or closure in which local variable or param is declared.
@@ -79,6 +87,7 @@ func (n *Name) RecordFrameOffset(offset int64) {
 
 // NewNameAt returns a new ONAME Node associated with symbol s at position pos.
 // The caller is responsible for setting Curfn.
+// NewNameAt 返回与在pos位置的sym 关联的新 ONAME 节点。调用方负责设置 Curfn。
 func NewNameAt(pos src.XPos, sym *types.Sym, typ *types.Type) *Name {
 	if sym == nil {
 		base.Fatalf("NewNameAt nil")
@@ -366,6 +375,7 @@ func Uses(x Node, v *Name) bool {
 
 // DeclaredBy reports whether expression x refers (directly) to a
 // variable that was declared by the given statement.
+// DeclaredBy 判断表达式 x 是否（直接）引用给定语句声明的变量。
 func DeclaredBy(x, stmt Node) bool {
 	if stmt == nil {
 		base.Fatalf("DeclaredBy nil")
@@ -376,6 +386,8 @@ func DeclaredBy(x, stmt Node) bool {
 // The Class of a variable/function describes the "storage class"
 // of a variable or function. During parsing, storage classes are
 // called declaration contexts.
+// variable/function的 Class 描述变量或函数的“storage class”。
+// 在解析期间，存储类称为声明上下文。
 type Class uint8
 
 //go:generate stringer -type=Class name.go

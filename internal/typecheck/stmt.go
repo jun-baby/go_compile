@@ -25,6 +25,8 @@ func typecheckrangeExpr(n *ir.RangeStmt) {
 // type check assignment.
 // if this assignment is the definition of a var on the left side,
 // fill in the var's type.
+// 赋值语句的type check。
+// 如果此赋值是左侧 var 的定义，请填写 var 的类型。
 func tcAssign(n *ir.AssignStmt) {
 	if base.EnableTrace && base.Flag.LowerT {
 		defer tracePrint("tcAssign", n)(nil)

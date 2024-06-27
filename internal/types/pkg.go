@@ -18,7 +18,7 @@ var pkgMap = make(map[string]*Pkg)
 type Pkg struct {
 	Path    string // string literal used in import statement, e.g. "runtime/cmd_internal/sys"
 	Name    string // package name, e.g. "sys"
-	Prefix  string // escaped path for use in symbol table
+	Prefix  string // escaped path for use in symbol table 在符号表中使用的转义路径
 	Syms    map[string]*Sym
 	Pathsym *obj.LSym
 
@@ -68,6 +68,7 @@ func (pkg *Pkg) Lookup(name string) *Sym {
 }
 
 // LookupOK looks up name in pkg and reports whether it previously existed.
+// LookupOK 在 pkg 中查找名称并报告它以前是否存在
 func (pkg *Pkg) LookupOK(name string) (s *Sym, existed bool) {
 	// TODO(gri) remove this check in favor of specialized lookup
 	if pkg == nil {
@@ -99,8 +100,9 @@ func (pkg *Pkg) LookupBytes(name []byte) *Sym {
 
 // LookupNum looks up the symbol starting with prefix and ending with
 // the decimal n. If prefix is too long, LookupNum panics.
+// LookupNum 查找以前缀开头、以十进制 n 结尾的符号。如果前缀太长，LookupNum 会崩溃。
 func (pkg *Pkg) LookupNum(prefix string, n int) *Sym {
-	var buf [20]byte // plenty long enough for all current users
+	var buf [20]byte // plenty long enough for all current users(对于所有当前使用者来说，足够长)
 	copy(buf[:], prefix)
 	b := strconv.AppendInt(buf[:len(prefix)], int64(n), 10)
 	return pkg.LookupBytes(b)

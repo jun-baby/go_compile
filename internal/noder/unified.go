@@ -224,6 +224,9 @@ func unified(m posMap, noders []*noder) {
 // If duringInlining is true, then the inline.InlineDecls is called as
 // necessary on instantiations of imported generic functions, so their
 // inlining costs can be computed.
+// readBodies 以迭代方式遍历所有挂起的字典和函数体。
+// 如果 duringInlining 为 true，则在导入的泛型函数的实例化时，
+// 根据需要调用 inline.InlineDecls，以便可以计算其内联成本。
 func readBodies(target *ir.Package, duringInlining bool) {
 	var inlDecls []*ir.Func
 
@@ -303,6 +306,7 @@ func readBodies(target *ir.Package, duringInlining bool) {
 // writePkgStub type checks the given parsed source files,
 // writes an export data package stub representing them,
 // and returns the result.
+// writePkgStub 类型检查给定的已分析源文件，写入表示它们的导出数据包存根，并返回结果。
 func writePkgStub(m posMap, noders []*noder) string {
 	pkg, info := checkFiles(m, noders)
 

@@ -50,6 +50,17 @@ import (
 // The OMETHVALUE uses n.Func to record the linkage to
 // the generated ODCLFUNC, but there is no
 // pointer from the Func back to the OMETHVALUE.
+// Func 对应于 Go 程序中的单个函数（反之亦然：每个函数只用一个 Func 表示）。
+// 有多个节点表示 IR 中的 Func。ONAME 节点 （Func.Nname） 用于对它的纯引用。
+// ODCLFUNC 节点（Func 本身）用于其声明代码。
+// OCLOSURE 节点 （Func.OClosure） 用于引用函数文本。
+// 导入的函数将具有一个 ONAME 节点，该节点指向具有空正文的 Func。
+// 声明的函数或方法具有 ODCLFUNC（Func 本身）和 ONAME。
+// 函数文本直接由 OCLOSURE 表示，但它也有一个 ODCLFUNC（和一个匹配的 ONAME），表示已编译的闭包基础形式，它使用寄存器中传递的特殊数据结构访问捕获的变量。
+// 方法声明的表示方式与函数类似，但 f.Sym 将是限定的方法名称（例如，“T.m”）。
+// 方法表达式 （T.M） 表示为 OMETHEXPR 节点，其中 n.Left 和 n.Right 分别指向类型和方法。
+// 源代码中每个方法表达式的不同提及都会构造一个新节点。
+// 方法值 （t.M） 在直接调用时由 ODOTMETHODOTINTER 表示，否则由 OMETHVALUE 表示。这些类似于方法表达式，但对于 ODOTMETHODOTINTER，方法名称存储在 Sym 而不是 Right 中。每个 OMETHVALUE 最终都作为一个新函数实现，有点像闭包，具有自己的 ODCLFUNC。OMETHVALUE 使用 n.Func 记录与生成的 ODCLFUNC 的链接，但没有从 Func 返回 OMETHVALUE 的指针。
 type Func struct {
 	miniNode
 	Body Nodes
@@ -62,6 +73,9 @@ type Func struct {
 	// Names must be listed PPARAMs, PPARAMOUTs, then PAUTOs,
 	// with PPARAMs and PPARAMOUTs in order corresponding to the function signature.
 	// Anonymous and blank params are declared as ~pNN (for PPARAMs) and ~rNN (for PPARAMOUTs).
+	// 此功能闭包的所有参数的 ONAME 节点不包括 closurevar，直到在遍历期间转换闭包。
+	// 名称必须列出 PPARAMs、PPARAMOUTS，然后是 PAUTO，PPARAM 和 PPARAMOUT 的顺序与函数签名相对应。
+	// 匿名参数和空白参数声明为 ~pNN（对于 PPARAMs）和 ~rNN（对于 PPARAMOUTS）。
 	Dcl []*Name
 
 	// ClosureVars lists the free variables that are used within a
@@ -153,6 +167,7 @@ type WasmImport struct {
 //
 // TODO(mdempsky): I suspect there's no need for separate fpos and
 // npos.
+// 根据给定的name和type创建一个func；fpos是该方法的位置坐标，npos是name标识符的位置坐标
 func NewFunc(fpos, npos src.XPos, sym *types.Sym, typ *types.Type) *Func {
 	name := NewNameAt(npos, sym, typ)
 	name.Class = PFUNC
@@ -565,6 +580,9 @@ func FuncPC(pos src.XPos, n Node, wantABI obj.ABI) Node {
 //
 // If setNname is true, then it also sets types.Field.Nname for each
 // parameter.
+//
+// DeclareParams 为 fn 签名中的所有参数创建名称，并将它们添加到 fn.Dcl 中。
+// 如果 setNname 为 true，则它还设置每个参数的types.Field.Nname。
 func (fn *Func) DeclareParams(setNname bool) {
 	if fn.Dcl != nil {
 		base.FatalfAt(fn.Pos(), "%v already has Dcl", fn)

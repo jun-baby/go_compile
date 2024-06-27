@@ -916,6 +916,7 @@ func (t *Type) FuncArgs() *Type {
 }
 
 // IsFuncArgStruct reports whether t is a struct representing function parameters or results.
+// IsFuncArgStruct 判断 t 是否是结构体类型的函数参数或者结果。
 func (t *Type) IsFuncArgStruct() bool {
 	return t.kind == TSTRUCT && t.extra.(*Struct).ParamTuple
 }
@@ -1722,6 +1723,7 @@ func NewInterface(methods []*Field) *Type {
 
 // NewSignature returns a new function type for the given receiver,
 // parameters, and results, any of which may be nil.
+// NewSignature 为给定的接收器、参数和结果，返回新的函数类型，其中任何一个都可能是 nil。
 func NewSignature(recv *Field, params, results []*Field) *Type {
 	startParams := 0
 	if recv != nil {

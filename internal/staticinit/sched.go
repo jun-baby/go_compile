@@ -1187,6 +1187,8 @@ func AddKeepRelocations() {
 // calls to separate "map init" functions (where possible and
 // profitable), to facilitate better dead-code elimination by the
 // linker.
+// OutlineMapInits 将全局map初始值设定项替换为对单独的“map init”函数的概述调用（在可能且有利可图的情况下），
+// 以便链接器更好地消除死代码。
 func OutlineMapInits(fn *ir.Func) {
 	if base.Debug.WrapGlobalMapCtl == 1 {
 		return

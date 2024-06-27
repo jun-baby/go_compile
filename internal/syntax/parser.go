@@ -28,12 +28,17 @@ type parser struct {
 	pragma    Pragma   // pragmas
 	goVersion string   // Go version from //go:build line
 
-	top    bool   // in top of file (before package clause)
+	top    bool   // in top of file (before package clause) 是否在文件顶部，package语法之前
 	fnest  int    // function nesting level (for error handling)
 	xnest  int    // expression nesting level (for complit ambiguity resolution)
 	indent []byte // tracing support
 }
 
+// 初始化解析器，
+// file:
+// r:文件输入流
+// errh:错误处理方法
+// pragh:语法处理器
 func (p *parser) init(file *PosBase, r io.Reader, errh ErrorHandler, pragh PragmaHandler, mode Mode) {
 	p.top = true
 	p.file = file
@@ -47,6 +52,9 @@ func (p *parser) init(file *PosBase, r io.Reader, errh ErrorHandler, pragh Pragm
 		// handler is always at or after the current reading
 		// position, it is safe to use the most recent position
 		// base to compute the corresponding Pos value.
+		// 扫描器的错误和指令处理器。
+		// 因为传递给处理器的（行，列）位置总是在当前阅读位置或之后，
+		// 所以使用最近的位置基准来计算相应的 Pos 值是安全的。
 		func(line, col uint, msg string) {
 			if msg[0] != '/' {
 				p.errorAt(p.posAt(line, col), msg)
@@ -56,17 +64,22 @@ func (p *parser) init(file *PosBase, r io.Reader, errh ErrorHandler, pragh Pragm
 			// otherwise it must be a comment containing a line or go: directive.
 			// //line directives must be at the start of the line (column colbase).
 			// /*line*/ directives can be anywhere in the line.
+			// 其他情况，只能是包含line或go:指令的注释
+			// //line，line必须在开头，/*line*/可以在行的任意位置
 			text := commentText(msg)
+			// line指令处理
 			if (col == colbase || msg[1] == '*') && strings.HasPrefix(text, "line ") {
 				var pos Pos // position immediately following the comment
 				if msg[1] == '/' {
 					// line comment (newline is part of the comment)
+					// 行注释（换行是注释的一部分）
 					pos = MakePos(p.file, line+1, colbase)
 				} else {
 					// regular comment
 					// (if the comment spans multiple lines it's not
 					// a valid line directive and will be discarded
 					// by updateBase)
+					// 常规注释（如果注释跨越多行，则它不是有效的行指令，将被updateBase丢弃）
 					pos = MakePos(p.file, line, col+uint(len(msg)))
 				}
 				p.updateBase(pos, line, col+2+5, text[5:]) // +2 to skip over // or /*
@@ -74,6 +87,7 @@ func (p *parser) init(file *PosBase, r io.Reader, errh ErrorHandler, pragh Pragm
 			}
 
 			// go: directive (but be conservative and test)
+			// go:指令处理
 			if strings.HasPrefix(text, "go:") {
 				if p.top && strings.HasPrefix(msg, "//go:build") {
 					if x, err := constraint.Parse(msg); err == nil {
@@ -328,6 +342,7 @@ const stopset uint64 = 1<<_Break |
 // The stopset is only considered if we are inside a function (p.fnest > 0).
 // The followlist is the list of valid tokens that can follow a production;
 // if it is empty, exactly one (non-EOF) token is consumed to ensure progress.
+// 前进，直到遇到followlist中的其中一个
 func (p *parser) advance(followlist ...token) {
 	if trace {
 		p.print(fmt.Sprintf("advance %s", followlist))
@@ -409,6 +424,7 @@ func (p *parser) fileOrNil() *File {
 	p.want(_Semi)
 
 	// don't bother continuing if package clause has errors
+	// 如果package语法遇到错误，则直接返回
 	if p.first != nil {
 		return nil
 	}
@@ -864,13 +880,14 @@ func (p *parser) binaryExpr(x Expr, prec int) Expr {
 }
 
 // UnaryExpr = PrimaryExpr | unary_op UnaryExpr .
+// 一元表达式解析。
 func (p *parser) unaryExpr() Expr {
 	if trace {
 		defer p.trace("unaryExpr")()
 	}
 
 	switch p.tok {
-	case _Operator, _Star:
+	case _Operator, _Star: // 操作符或者地址解析符号(*)
 		switch p.op {
 		case Mul, Add, Sub, Not, Xor, Tilde:
 			x := new(Operation)
@@ -880,7 +897,7 @@ func (p *parser) unaryExpr() Expr {
 			x.X = p.unaryExpr()
 			return x
 
-		case And:
+		case And: // 取地址符号 &
 			x := new(Operation)
 			x.pos = p.pos()
 			x.Op = And
@@ -1331,12 +1348,12 @@ func (p *parser) typeOrNil() Expr {
 	pos := p.pos()
 	switch p.tok {
 	case _Star:
-		// ptrtype
+		// ptr type :指针类型
 		p.next()
 		return newIndirect(pos, p.type_())
 
 	case _Arrow:
-		// recvchantype
+		// receive chan type:只读通道类型
 		p.next()
 		p.want(_Chan)
 		t := new(ChanType)
@@ -1346,7 +1363,7 @@ func (p *parser) typeOrNil() Expr {
 		return t
 
 	case _Func:
-		// fntype
+		// fn type：函数类型
 		p.next()
 		_, t := p.funcType("function type")
 		return t
@@ -2793,6 +2810,7 @@ func (p *parser) exprList() Expr {
 // trailing) comma.
 //
 // typeList = arg { "," arg } [ "," ] .
+// 解析type；strict为false时，表示第一个元素有可能是表达式
 func (p *parser) typeList(strict bool) (x Expr, comma bool) {
 	if trace {
 		defer p.trace("typeList")()

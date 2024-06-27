@@ -630,12 +630,14 @@ func (r *reader) param() *types.Field {
 var objReader = map[*types.Sym]pkgReaderIndex{}
 
 // obj reads an instantiated object reference from the bitstream.
+// obj 从r中读取实例化的对象引用。
 func (r *reader) obj() ir.Node {
 	return r.p.objInstIdx(r.objInfo(), r.dict, false)
 }
 
 // objInfo reads an instantiated object reference from the bitstream
 // and returns the encoded reference to it, without instantiating it.
+// objInfo 从r中读取实例化的对象引用，并返回对它的编码引用，而不对其进行实例化。
 func (r *reader) objInfo() objInfo {
 	r.Sync(pkgbits.SyncObject)
 	assert(!r.Bool()) // TODO(mdempsky): Remove; was derived func inst.
@@ -3230,6 +3232,7 @@ func (r *reader) pkgInit(self *types.Pkg, target *ir.Package) {
 
 // pkgInitOrder creates a synthetic init function to handle any
 // package-scope initialization statements.
+// 创建一个init函数，来处理包init方法
 func (r *reader) pkgInitOrder(target *ir.Package) {
 	initOrder := make([]ir.Node, r.Len())
 	if len(initOrder) == 0 {

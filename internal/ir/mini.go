@@ -27,6 +27,15 @@ import (
 // The embedding struct should also fill in n.op in its constructor,
 // for more useful panic messages when invalid methods are called,
 // instead of implementing Op itself.
+// miniNode 是一个最小节点实现，旨在作为第一个字段嵌入到更大的节点实现中，成本为 8 字节。
+// miniNode 本身不是一个有效的节点：
+//
+//	嵌入结构必须至少提供：
+//	 func (n *MyNode) String() string { return fmt.Sprint(n) }
+//	 func (n *MyNode) rawCopy() Node { c := *n; return &c }
+//	 func (n *MyNode) Format(s fmt.State, verb rune) { FmtNode(n, s, verb) }
+//
+// 嵌入结构还应该在其构造函数中填充 n.op，以便在调用无效方法时发出更有用的紧急消息，而不是实现 Op 本身。
 type miniNode struct {
 	pos  src.XPos // uint32
 	op   Op       // uint8

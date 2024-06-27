@@ -71,6 +71,7 @@ func IsSynthetic(n Node) bool {
 
 // IsAutoTmp indicates if n was created by the compiler as a temporary,
 // based on the setting of the .AutoTemp flag in n's Name.
+// 判断n是否是一个编译器生成的临时的name
 func IsAutoTmp(n Node) bool {
 	if n == nil || n.Op() != ONAME {
 		return false
@@ -496,6 +497,9 @@ func IsMethod(n Node) bool {
 // It's primarily used to distinguish references to named objects,
 // whose Pos will point back to their declaration position rather than
 // their usage position.
+//
+// HasUniquePos 判断 n 是否具有可用于决定错误消息的唯一位置。
+// 它主要用于区分对命名对象的引用，其 Pos 将指向其声明位置而不是其使用位置。
 func HasUniquePos(n Node) bool {
 	switch n.Op() {
 	case ONAME:

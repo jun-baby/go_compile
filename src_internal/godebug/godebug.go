@@ -195,8 +195,8 @@ func registerMetric(name string, read func() uint64)
 func setNewIncNonDefault(newIncNonDefault func(string) func())
 
 func init() {
-	setUpdate(update)
-	setNewIncNonDefault(newIncNonDefault)
+	//setUpdate(update)
+	//setNewIncNonDefault(newIncNonDefault)
 }
 
 func newIncNonDefault(name string) func() {

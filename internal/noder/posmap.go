@@ -11,6 +11,7 @@ import (
 )
 
 // A posMap handles mapping from syntax.Pos to src.XPos.
+// 处理 syntax.Pos. 到 src.XPos. 的映射
 type posMap struct {
 	bases map[*syntax.PosBase]*src.PosBase
 	cache struct {

@@ -25,6 +25,8 @@ type Expr interface {
 // TODO(rsc): Once we are sure about the contents, compact the bools
 // into a bit field and leave extra bits available for implementations
 // embedding miniExpr. Right now there are ~60 unused bits sitting here.
+// miniExpr 是一个 miniNode，具有表达式共有的额外字段。
+// TODO（rsc）：一旦我们确定了内容，就将布尔值压缩到一个位域中，并留下额外的位用于嵌入 miniExpr 的实现。现在有 ~60 个未使用的位坐在这里。
 type miniExpr struct {
 	miniNode
 	typ   *types.Type

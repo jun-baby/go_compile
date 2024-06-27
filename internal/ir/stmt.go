@@ -45,6 +45,7 @@ type Stmt interface {
 }
 
 // A miniStmt is a miniNode with extra fields common to statements.
+// miniStmt 是一个 miniNode，具有语句通用的额外字段。
 type miniStmt struct {
 	miniNode
 	init Nodes
@@ -59,6 +60,8 @@ func (n *miniStmt) PtrInit() *Nodes { return &n.init }
 // An AssignListStmt is an assignment statement with
 // more than one item on at least one side: Lhs = Rhs.
 // If Def is true, the assignment is a :=.
+// AssignListStmt 是一个赋值语句，至少在一侧具有多个项目: Lhs = Rhs。
+// 如果 Def 为 true，则赋值为 :=。
 type AssignListStmt struct {
 	miniStmt
 	Lhs Nodes
@@ -86,6 +89,7 @@ func (n *AssignListStmt) SetOp(op Op) {
 
 // An AssignStmt is a simple assignment statement: X = Y.
 // If Def is true, the assignment is a :=.
+// 一个简单的赋值语句， X = Y。如果 Def 为true，则表示是 :=
 type AssignStmt struct {
 	miniStmt
 	X   Node
